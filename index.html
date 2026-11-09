@@ -49,7 +49,13 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .wrap{max-width:640px;margin:0 auto;padding:0 16px}
 
 /* Header */
-header{padding:calc(18px + env(safe-area-inset-top)) 0 6px}
+header{padding:calc(18px + env(safe-area-inset-top)) 0 6px;position:relative}
+.refresh{position:absolute;right:0;top:calc(10px + env(safe-area-inset-top));width:38px;height:38px;border-radius:19px;background:var(--card);border:.5px solid var(--hair);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--accent)}
+.refresh svg{width:19px;height:19px}
+.refresh.spin svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ptr{position:fixed;left:50%;top:calc(6px + env(safe-area-inset-top));z-index:40;width:36px;height:36px;margin-left:-18px;border-radius:18px;background:var(--card);box-shadow:0 2px 10px rgba(0,0,0,.15);display:grid;place-items:center;color:var(--accent);opacity:0;transform:translateY(-50px);pointer-events:none}
+.ptr svg{width:18px;height:18px}
 .eyebrow{font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--sub);text-transform:uppercase;display:flex;gap:8px;align-items:center}
 .eyebrow .ball{width:10px;height:10px;border-radius:50%;background:var(--ball);box-shadow:inset -2px -2px 0 rgba(0,0,0,.08)}
 h1{font-size:34px;line-height:1.1;letter-spacing:-.025em;margin:6px 0 4px;font-weight:800}
@@ -98,7 +104,7 @@ h1{font-size:34px;line-height:1.1;letter-spacing:-.025em;margin:6px 0 4px;font-w
 .tag.hall{background:var(--accent-soft);color:var(--accent)}
 
 /* Actions */
-.actions{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:8px;padding:0 12px 12px}
+.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 12px 12px}
 .btn{height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:7px;
   font-weight:650;font-size:15px;background:var(--card2);color:var(--text);transition:transform .08s,opacity .15s;white-space:nowrap}
 .btn:active{transform:scale(.97);opacity:.85}
@@ -174,7 +180,7 @@ footer{font-size:12px;color:var(--sub);padding:18px 2px 8px;line-height:1.5}
 .sheet .ico{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px}
 .sheet .cancel{margin-top:8px;background:var(--card);border-radius:16px;justify-content:center;font-weight:650;color:var(--accent);border:0}
 @media (max-width:389px){
-  .actions{gap:6px;padding:0 10px 10px;grid-template-columns:1fr 1.05fr 1.2fr}
+  .actions{gap:6px;padding:0 10px 10px;grid-template-columns:1fr 1.1fr 1fr}
   .btn{font-size:14px;gap:5px;height:44px}
   .btn svg{width:16px;height:16px}
   .split .more{width:28px}
@@ -188,6 +194,9 @@ footer{font-size:12px;color:var(--sub);padding:18px 2px 8px;line-height:1.5}
 
 <div class="wrap">
   <header>
+    <button class="refresh" id="refresh" aria-label="Obnovit">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>
+    </button>
     <div class="eyebrow"><span class="ball"></span>Praha 7 · Holešovice a okolí</div>
     <h1 id="title">Tenisové kurty</h1>
     <p class="summary" id="summary">&nbsp;</p>
@@ -211,8 +220,7 @@ footer{font-size:12px;color:var(--sub);padding:18px 2px 8px;line-height:1.5}
       <span><i class="dot season"></i>Mimo sezónu</span>
     </div>
     <footer>
-      Údaje ověřeny z webů klubů k 8. 11. 2026. Ceny za 1 hodinu kurtu pro veřejnost, mohou se měnit.
-      „—“ = klub údaj na webu neuvádí. Svátky se nezohledňují.
+      Údaje ověřeny z webů klubů k 8. 11. 2026.
     </footer>
   </section>
 
@@ -245,6 +253,7 @@ footer{font-size:12px;color:var(--sub);padding:18px 2px 8px;line-height:1.5}
   </div>
 </nav>
 
+<div class="ptr" id="ptr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></div>
 <div class="sheet-bg" id="sheet-bg"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Navigovat">
   <div class="grp" id="sheet-grp"></div>
@@ -456,7 +465,7 @@ function card(c,i){
         <a class="btn" href="${NAV[0].url(c)}" target="_blank" rel="noopener" aria-label="Trasa ve Waze"><span class="waze">${I.waze}</span>Trasa</a>
         <button class="btn more" data-nav="${c.id}" aria-label="Další navigace">${I.chevD}</button>
       </div>
-      <a class="btn primary" href="${c.book}" target="_blank" rel="noopener">Rezervovat ${I.ext}</a>
+      <a class="btn primary" href="${c.book}" target="_blank" rel="noopener">Rezervovat</a>
     </div>
     <div class="details" id="d-${c.id}"><div>
       <dl class="dl">
@@ -476,6 +485,11 @@ function card(c,i){
   </article>`;
 }
 
+/* pořadí: jak v seznamu, kurty mimo sezónu až na konec */
+function ordered(){
+  const a=COURTS.map(c=>({c,st:statusOf(c)}));
+  return [...a.filter(x=>x.st.active),...a.filter(x=>!x.st.active)];
+}
 function render(){
   const sts=COURTS.map(statusOf);
   const nOpen=sts.filter(s=>s.open).length, nSeason=sts.filter(s=>s.active).length;
@@ -483,12 +497,11 @@ function render(){
   document.getElementById("n-open").textContent=nOpen;
   document.getElementById("n-season").textContent=nSeason;
   const now=new Intl.DateTimeFormat("cs-CZ",{timeZone:"Europe/Prague",weekday:"long",hour:"2-digit",minute:"2-digit"}).format(new Date());
-  document.getElementById("summary").innerHTML=`<b>${nOpen}</b> otevřeno teď · <b>${nSeason}</b> v sezóně · ${now}`;
+  document.getElementById("summary").textContent=now.charAt(0).toUpperCase()+now.slice(1);
   document.querySelectorAll(".chip").forEach(b=>b.setAttribute("aria-pressed",b.dataset.f===filter));
-  listEl.innerHTML=COURTS.map((c,i)=>{
-    const s=sts[i];
-    if(filter==="open"&&!s.open) return "";
-    if(filter==="season"&&!s.active) return "";
+  listEl.innerHTML=ordered().map(({c,st},i)=>{
+    if(filter==="open"&&!st.open) return "";
+    if(filter==="season"&&!st.active) return "";
     return card(c,i);
   }).join("") || `<div class="note">Žádný kurt neodpovídá filtru.</div>`;
 }
@@ -561,7 +574,7 @@ async function initMap(){
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map);
   L.control.zoom({position:"bottomright"}).addTo(map);
   const cache=readCache(), pts=[];
-  for(const [i,c] of COURTS.entries()){
+  for(const [i,{c}] of ordered().entries()){
     let ll=c.ll||cache[c.id];
     if(!ll){ try{ ll=await geocode(c); if(ll){cache[c.id]=ll;writeCache(cache);} await new Promise(r=>setTimeout(r,1100)); }catch(e){} }
     if(!ll) continue;
@@ -594,6 +607,19 @@ function initBeta(){
 
 render();
 setInterval(render,60000);
+
+/* ---------- Obnovení: ikonka + potažení dolů ---------- */
+function hardReload(){ document.getElementById("refresh").classList.add("spin"); location.reload(); }
+document.getElementById("refresh").onclick=hardReload;
+(function(){
+  const ptr=document.getElementById("ptr"), svg=ptr.firstElementChild; let y0=null, d=0;
+  const sheetOpen=()=>document.getElementById("sheet").classList.contains("on");
+  addEventListener("touchstart",e=>{ if(scrollY<=0 && !sheetOpen() && !e.target.closest("#map,.frame")) y0=e.touches[0].clientY; else y0=null; },{passive:true});
+  addEventListener("touchmove",e=>{ if(y0===null) return; d=Math.max(0,e.touches[0].clientY-y0);
+    const k=Math.min(d/80,1); ptr.style.opacity=k; ptr.style.transform=`translateY(${Math.min(d*.6,60)-50}px)`; svg.style.transform=`rotate(${d*3}deg)`; },{passive:true});
+  addEventListener("touchend",()=>{ if(y0!==null && d>80){ ptr.style.transform="translateY(14px)"; svg.style.animation="spin .8s linear infinite"; hardReload(); }
+    else { ptr.style.opacity=0; ptr.style.transform="translateY(-50px)"; } y0=null; d=0; });
+})();
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden) render(); });
 const h=location.hash.slice(1); if(views[h]) showView(h);
 addEventListener("hashchange",()=>{ const v=location.hash.slice(1); showView(views[v]?v:"list"); });
