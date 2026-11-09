@@ -3,9 +3,8 @@
 Statická webová appka (jeden `index.html`, vanilla JS) se seznamem tenisových kurtů:
 status otevřeno/zavřeno podle otevíracích hodin a sezóny, tlačítka Zavolat, Trasa (Waze + další navigace), Rezervovat ↗.
 
-- **Kurty** – v1, statická data (ověřeno 8. 11. 2026)
+- **Kurty** – statická data (ověřeno 8. 11. 2026), oblíbené ⭐, řazení „Nejblíž“ (GPS), aktuální cena „teď X Kč/h“
 - **Mapa (beta)** – Leaflet + OpenStreetMap, polohy dohledány podle adresy
-- **Termíny (beta)** – rezervační systém klubu vložený do appky
 
 ## Úprava dat
 Pole `COURTS` na začátku `<script>` v `index.html`.
