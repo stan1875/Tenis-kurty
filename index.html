@@ -208,13 +208,14 @@ footer{font-size:12px;color:var(--sub);padding:18px 2px 8px;line-height:1.5}
   <!-- VIEW: Mapa -->
   <section class="view" id="view-map" hidden>
     <div id="map" role="region" aria-label="Mapa kurtů"></div>
-    <div class="note" id="map-note"><b>Beta.</b> Polohy se dohledávají podle adresy (OpenStreetMap) a ukládají v prohlížeči. Navigace v kartách používá přesnou adresu.</div>
+    <div class="note" id="map-note"><b>Beta.</b> Polohy podle adresy (OpenStreetMap). Klepnutím na pin: Waze nebo rezervace.</div>
   </section>
 
   <!-- VIEW: Beta (v2) -->
   <section class="view" id="view-beta" hidden>
     <div class="note"><b>Volné termíny – beta.</b> Rezervační systém klubu zobrazený přímo v aplikaci. Některé systémy vložení blokují – pak použijte „Otevřít v nové kartě“. Další krok (v2): stahování volných slotů přes Netlify Function.</div>
     <select class="picker" id="picker" aria-label="Vyberte kurt"></select>
+    <div class="note" id="embed-hint" hidden style="margin:10px 0 0"></div>
     <div style="display:flex;gap:8px;margin-top:10px">
       <a class="btn primary" id="embed-open" target="_blank" rel="noopener" style="flex:1">Otevřít v nové kartě ↗</a>
     </div>
@@ -247,7 +248,7 @@ footer{font-size:12px;color:var(--sub);padding:18px 2px 8px;line-height:1.5}
    ========================================================= */
 const WD = (a,b)=>[a,b];
 const COURTS = [
-  { id:"banik", name:"Baník", full:"Tenis Baník Praha", area:"Praha 7 · Povltavská",
+  { id:"banik", ll:[50.1150199,14.4410047], name:"Baník", full:"Tenis Baník Praha", area:"Praha 7 · Povltavská",
     nav:"Tenis Baník, Povltavská, Praha 7", phone:"+420733307085",
     book:"https://rezervace.tenisbanik.cz/", web:"https://tenisbanik.cz",
     courts:"9 kurtů", surface:"Antuka (venku)", hall:false, priceFrom:250,
@@ -256,7 +257,7 @@ const COURTS = [
     prices:[["Po–Pá 7–16","250 Kč"],["Po–Pá 16–21","290 Kč"],["So–Ne 8–20","250 Kč"]],
     priceNote:"Hosté, za kurt bez ohledu na počet osob" },
 
-  { id:"sparta", name:"Sparta", full:"TK Sparta Praha (Stromovka)", area:"Praha 7 · Bubeneč",
+  { id:"sparta", ll:[50.1103645,14.4092412], name:"Sparta", full:"TK Sparta Praha (Stromovka)", area:"Praha 7 · Bubeneč",
     nav:"Za Císařským mlýnem 1115/2, Praha 7", phone:"+420731422225",
     book:"https://www.rogeronline.cz/r/courtst.php?klub=21", web:"https://tkspartapraha.cz",
     courts:"—", surface:"Antuka, hard; zima: hala (hard)", hall:true, priceFrom:620,
@@ -266,7 +267,7 @@ const COURTS = [
     prices:[["Zima · Po–Pá 7–9","620 Kč"],["Zima · Po–Pá 9–21","790 Kč"],["Zima · So–Ne 8–19","650 Kč"],["Léto · antuka","240–360 Kč"],["Léto · hard","220–280 Kč"]],
     priceNote:"Ceník platný od 1. 4. 2026" },
 
-  { id:"olsanska", name:"Olšanská", full:"Tenis Olšanská", area:"Praha 3 · Žižkov",
+  { id:"olsanska", login:true, ll:[50.0837494,14.4596191], name:"Olšanská", full:"Tenis Olšanská", area:"Praha 3 · Žižkov",
     nav:"Chelčického 43, Praha 3", phone:"+420606810852",
     book:"https://www.tenisolsanska.cz/online-rezervace", web:"https://www.tenisolsanska.cz",
     courts:"3 kurty", surface:"Umělá tráva FAST TRACK; zima: vyhřívaná hala", hall:true, priceFrom:550,
@@ -274,7 +275,7 @@ const COURTS = [
     seasonText:"Zimní sezóna (hala): 5. 10. 2026 – 18. 4. 2027",
     prices:[["Zima · Po–Pá 7–16","550 Kč"],["Zima · Po–Pá 16–22","700 Kč"],["Zima · So–Ne 8–21","600 Kč"]] },
 
-  { id:"ladvi", name:"Ládví", full:"Tenis Ládví", area:"Praha 8 · Kobylisy",
+  { id:"ladvi", ll:[50.1313606,14.4756259], name:"Ládví", full:"Tenis Ládví", area:"Praha 8 · Kobylisy",
     nav:"Chabařovická 4, Praha 8", phone:"+420604698500",
     book:"https://jdemenato.cz/reservation/portalsearchcalendar/78194967/Tenis-Ladvi-", web:"https://tenisladvi.cz",
     courts:"8 kurtů", surface:"Antuka; zima: přetlakové haly", hall:true, priceFrom:400,
@@ -283,7 +284,7 @@ const COURTS = [
     seasonText:"Zima: 5. 10. 2026 – 11. 4. 2027. Vstup z ulice Žernosecká, parkoviště v areálu.",
     prices:[["Zima · standard","400–690 Kč"],["Zima · last minute (≤12 h)","360–621 Kč"]] },
 
-  { id:"admira", name:"Admira", full:"Tenis Admira (MG Tenis)", area:"Praha 8 · Kobylisy",
+  { id:"admira", ll:[50.1294888,14.4534703], name:"Admira", full:"Tenis Admira (MG Tenis)", area:"Praha 8 · Kobylisy",
     nav:"Na Pecích 46, Praha 8", phone:"+420604118535",
     book:"https://jdemenato.cz/reservation/portalsearchcalendar/64956223/Tenis-Admira--MG-Tenis-", web:"https://tenisadmira.cz",
     courts:"4 kurty", surface:"3× antuka, 1× umělý povrch", hall:false, priceFrom:400,
@@ -292,7 +293,7 @@ const COURTS = [
     seasonText:"Zima: 5. 10. 2026 – 11. 4. 2027. Web neuvádí, které kurty jsou v zimě kryté.",
     prices:[["Zima · standard","400–690 Kč"],["Zima · last minute (≤12 h)","360–621 Kč"]] },
 
-  { id:"svornost", name:"Svornost", full:"Tenis Svornost", area:"Praha 8 · Kobylisy",
+  { id:"svornost", ll:[50.1320301,14.4593182], name:"Svornost", full:"Tenis Svornost", area:"Praha 8 · Kobylisy",
     nav:"Větrušická 842, Praha 8", phone:"+420731411393",
     book:"https://jdemenato.cz/reservation/portalsearchcalendar/107478949/Tenis-Svornost", web:"https://tenissvornost.cz/",
     courts:"4 kurty", surface:"Antuka; zima: 2 v přetlakových halách", hall:true, priceFrom:400,
@@ -301,7 +302,7 @@ const COURTS = [
     seasonText:"Zima: 5. 10. 2026 – 11. 4. 2027. Pěší vstup z ulice Žernosecká nebo Větrušická.",
     prices:[["Zima · standard","400–690 Kč"],["Zima · last minute (≤12 h)","360–621 Kč"]] },
 
-  { id:"hector", name:"Hector", full:"Sportcentrum Hector", area:"Praha 10 · Malešice",
+  { id:"hector", login:true, ll:[50.086777,14.4969249], name:"Hector", full:"Sportcentrum Hector", area:"Praha 10 · Malešice",
     nav:"Malešická 655/59c, Praha 10", phone:"+420736286603",
     book:"https://www.r2s.cz/hector/", web:"https://www.hector.cz",
     courts:"4 kurty", surface:"Umělý povrch TigerTurf; zima: nafukovací vytápěná hala", hall:true, priceFrom:490,
@@ -310,7 +311,7 @@ const COURTS = [
     prices:[["Zima · Po–Pá 7–15","550 Kč"],["Zima · Po–Pá 15–20","750 Kč"],["Zima · Po–Pá 20–22","490 Kč"],["Zima · So–Ne 8–22","490 Kč"],["Léto","250–350 Kč"]],
     priceNote:"Jednorázová cena; předplacená a student/senior levněji" },
 
-  { id:"ltc", name:"Letná", full:"LTC Praha", area:"Praha 7 · Letenské sady",
+  { id:"ltc", ll:[50.0964045,14.4141409], name:"Letná", full:"LTC Praha", area:"Praha 7 · Letenské sady",
     nav:"LTC Praha, Letenské sady, Praha 7", phone:"+420605108466",
     book:"https://www.rogeronline.cz/v2/index_timeline.php?klub=187", book2:"https://ltcpraha.com/rezervace", web:"https://ltcpraha.com",
     courts:"8 kurtů; hala 4", surface:"Antuka; zima: hala na antuce", hall:true, priceFrom:null,
@@ -319,7 +320,7 @@ const COURTS = [
     seasonText:"Hala v provozu od 12. 10. 2026. Krátkodobé rezervace haly i telefonicky.",
     prices:null },
 
-  { id:"step", name:"Step", full:"Infinit Step Sportcentrum", area:"Praha 9 · Vysočany",
+  { id:"step", ll:[50.1014918,14.483383], name:"Step", full:"Infinit Step Sportcentrum", area:"Praha 9 · Vysočany",
     nav:"Malletova 2350/6, Praha 9", phone:"+420733141630",
     book:"https://memberzone.cz/infinit_step_sportcentrum/Scheduler.aspx", web:"https://step.infinit.cz",
     courts:"—", surface:"Vnitřní hala", hall:true, priceFrom:610,
@@ -327,15 +328,15 @@ const COURTS = [
     seasonText:"Nelze Multisport. S Infinit kartou −5 % na tenis.",
     prices:[["Po–Pá 7–10","650 Kč"],["Po–Pá 10–15","610 Kč"],["Po–Pá 15–22:30","730 Kč"],["So–Ne, svátky","660 Kč"]] },
 
-  { id:"meteor", name:"Meteor", full:"Tenis Meteor Praha", area:"Praha 8 · Libeň",
+  { id:"meteor", ll:[50.107049,14.4795186], name:"Meteor", full:"Tenis Meteor Praha", area:"Praha 8 · Libeň",
     nav:"Nad Kotlaskou 95, Praha 8", phone:"+420605701881",
-    book:"https://www.onlinehq.cz/r/courtst.php?klub=167", web:"http://www.meteortenis.cz",
+    book:"https://www.rogeronline.cz/v2/index.php?klub=167", web:"http://www.meteortenis.cz",
     courts:"4 kurty", surface:"Antuka (venku)", hall:false, priceFrom:220,
     seasons:[{label:"Hlavní sezóna", from:"03-15", to:"10-15", hours:{wd:WD(9,21), sat:WD(9,21), sun:WD(9,21)}}],
     seasonText:"15. 3. – 15. 10. dle počasí. Platba jen hotově nebo Multisport.",
     prices:[["Po–Pá do 15 h, víkend","220 Kč"],["Po–Pá po 15 h","300 Kč"]] },
 
-  { id:"stvanice", name:"Štvanice", full:"I. ČLTK Praha – Štvanice", area:"Praha 7 · Štvanice",
+  { id:"stvanice", ll:[50.0962423,14.4402628], name:"Štvanice", full:"I. ČLTK Praha – Štvanice", area:"Praha 7 · Štvanice",
     nav:"Štvanice 38, Praha 7", phone:"+420608974974",
     book:"https://www.rogeronline.cz/v2/index.php?klub=181", web:"https://cltk.cz/cs/",
     courts:"19 kurtů", surface:"13× antuka, 6× hard; zima: přetlakové haly + pevná hala", hall:true, priceFrom:400,
@@ -345,7 +346,7 @@ const COURTS = [
     prices:[["Léto · kurty 1–9","500 Kč"],["Léto · Slavoj 10–16","400 Kč"],["Pevná hala P1, P2","600 Kč"]],
     priceNote:"Zimní ceník 2026/27 jen v PDF na webu klubu" },
 
-  { id:"rudna", name:"Rudná", full:"Tenis & Beach Rudná", area:"Rudná u Prahy",
+  { id:"rudna", ll:[50.0264996,14.2239399], name:"Rudná", full:"Tenis & Beach Rudná", area:"Rudná u Prahy",
     nav:"Hořelické náměstí 1130/5, Rudná", phone:"+420728113400",
     book:"https://jdemenato.cz/reservation/tenisrudna/reservationcalendaroverview", book2:"https://www.tenisrudna.cz/rezervace/", web:"https://www.tenisrudna.cz",
     courts:"až 6 kurtů", surface:"Zima: hala 2026/2027", hall:true, priceFrom:200,
@@ -550,7 +551,7 @@ async function initMap(){
   L.control.zoom({position:"bottomright"}).addTo(map);
   const cache=readCache(), pts=[];
   for(const [i,c] of COURTS.entries()){
-    let ll=cache[c.id];
+    let ll=c.ll||cache[c.id];
     if(!ll){ try{ ll=await geocode(c); if(ll){cache[c.id]=ll;writeCache(cache);} await new Promise(r=>setTimeout(r,1100)); }catch(e){} }
     if(!ll) continue;
     const st=statusOf(c);
@@ -574,7 +575,9 @@ function initBeta(){
     pick.onchange=()=>{ try{localStorage.setItem("tk-beta",pick.value)}catch(e){} load(); };
     betaReady=true;
   }
-  function load(){ const c=COURTS.find(x=>x.id===pick.value); fr.src=c.book; op.href=c.book; }
+  function load(){ const c=COURTS.find(x=>x.id===pick.value); fr.src=c.book; op.href=c.book;
+    const hint=document.getElementById("embed-hint");
+    hint.hidden=!c.login; hint.innerHTML=c.login?"<b>Vyžaduje přihlášení.</b> Volné termíny tento systém ukáže až po přihlášení – pohodlněji v nové kartě.":""; }
   load();
 }
 
@@ -582,6 +585,7 @@ render();
 setInterval(render,60000);
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden) render(); });
 const h=location.hash.slice(1); if(views[h]) showView(h);
+addEventListener("hashchange",()=>{ const v=location.hash.slice(1); showView(views[v]?v:"list"); });
 </script>
 </body>
 </html>
