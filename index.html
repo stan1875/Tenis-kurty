@@ -9,7 +9,18 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Kurty">
 <title>Tenisové kurty</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23D4E84A'/%3E%3Cpath d='M18 22c20 12 20 44 0 56M82 22c-20 12-20 44 0 56' stroke='white' stroke-width='6' fill='none'/%3E%3C/svg%3E">
+<!-- Favicon (browser tab) -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎾</text></svg>">
+<!-- Apple touch icon — 🎾 na bílém pozadí, generováno přes canvas (stejně jako Denní menu) -->
+<script>
+(function(){try{
+  var c=document.createElement('canvas');c.width=180;c.height=180;
+  var x=c.getContext('2d');x.fillStyle='#ffffff';x.fillRect(0,0,180,180);
+  x.font='130px serif';x.textAlign='center';x.textBaseline='middle';x.fillText('🎾',90,98);
+  var l=document.createElement('link');l.rel='apple-touch-icon';l.sizes='180x180';l.href=c.toDataURL('image/png');
+  document.head.appendChild(l);
+}catch(e){}})();
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root{
